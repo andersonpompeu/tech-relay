@@ -56,17 +56,17 @@ const services = [
     price: "A partir de R$ 150",
   },
   {
-    icon: Waves,
-    name: "Secadora de Roupas",
-    slug: "conserto-secadora",
-    description: "Reparo de secadoras de roupas. Problemas de aquecimento, tambor e componentes eletrônicos.",
-    price: "A partir de R$ 120",
+    icon: Refrigerator,
+    name: "Freezer",
+    slug: "conserto-freezer",
+    description: "Conserto de freezers verticais e horizontais. Problemas de refrigeração, gás e componentes.",
+    price: "A partir de R$ 140",
   },
   {
-    icon: Droplets,
-    name: "Purificador de Água",
-    slug: "conserto-purificador",
-    description: "Manutenção e troca de filtros em purificadores. Vazamentos e problemas no sistema de filtragem.",
+    icon: WashingMachine,
+    name: "Tanquinho",
+    slug: "conserto-tanquinho",
+    description: "Reparo de tanquinhos. Centrifugação, motor, timer e componentes elétricos.",
     price: "A partir de R$ 80",
   },
 ];
@@ -121,9 +121,9 @@ const ServicesSection = () => {
                     variant="outline"
                     size="sm"
                   >
-                    <Link to={`/servicos/${service.slug}`}>
-                      Ver Mais
-                    </Link>
+          <Link to={`/servicos/${service.slug}`}>
+            Ver Mais
+          </Link>
                   </Button>
                 </CardFooter>
               </Card>

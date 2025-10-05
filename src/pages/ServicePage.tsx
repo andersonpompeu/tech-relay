@@ -1,4 +1,6 @@
 import { useParams, Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Helmet } from "react-helmet";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContactFormSection from "@/components/ContactFormSection";
@@ -10,76 +12,18 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { CheckCircle2, ArrowLeft } from "lucide-react";
-
-const serviceData: Record<string, any> = {
-  "conserto-geladeira": {
-    title: "Conserto de Geladeira em São Paulo",
-    description: "Assistência técnica especializada para geladeiras de todas as marcas",
-    longDescription: "Conte com os melhores profissionais para o conserto de sua geladeira em São Paulo. Atendemos todas as marcas e modelos, com garantia de serviço e peças originais. Nossa equipe está preparada para resolver problemas de refrigeração, vazamentos, ruídos e qualquer outro defeito.",
-    commonProblems: [
-      "Geladeira não está gelando adequadamente",
-      "Vazamento de água",
-      "Ruídos estranhos ou excessivos",
-      "Congelamento excessivo",
-      "Porta não veda corretamente",
-      "Luz interna não acende",
-      "Termostato com defeito",
-      "Motor não funciona",
-    ],
-    faq: [
-      {
-        q: "Quanto custa o conserto de uma geladeira?",
-        a: "O valor varia de acordo com o problema identificado. Nosso orçamento inicial é gratuito e sem compromisso. Após a visita técnica, você receberá um orçamento detalhado com o valor do serviço.",
-      },
-      {
-        q: "Vocês trabalham com quais marcas de geladeira?",
-        a: "Atendemos todas as marcas: Brastemp, Consul, Electrolux, LG, Samsung, Panasonic, Midea, entre outras. Nossos técnicos são especializados em diversos modelos.",
-      },
-      {
-        q: "Qual o prazo para conserto?",
-        a: "Na maioria dos casos, o conserto é realizado na mesma visita. Em situações que necessitam de peças específicas, o prazo pode variar de 1 a 3 dias úteis.",
-      },
-      {
-        q: "Tem garantia?",
-        a: "Sim! Oferecemos 90 dias de garantia em todos os serviços realizados e peças substituídas.",
-      },
-    ],
-  },
-  "conserto-maquina-lavar": {
-    title: "Conserto de Máquina de Lavar em São Paulo",
-    description: "Reparo profissional de máquinas de lavar de todas as marcas",
-    longDescription: "Serviço especializado de conserto para máquinas de lavar roupas. Nossa equipe técnica resolve problemas de vazamento, centrifugação, aquecimento e componentes eletrônicos com agilidade e qualidade garantida.",
-    commonProblems: [
-      "Máquina não liga ou não funciona",
-      "Vazamento de água",
-      "Problemas na centrifugação",
-      "Não agita ou não lava",
-      "Não drena a água",
-      "Ruídos anormais durante o funcionamento",
-      "Erro no painel eletrônico",
-      "Porta travada ou com defeito",
-    ],
-    faq: [
-      {
-        q: "Por que minha máquina está vazando?",
-        a: "Vazamentos podem ser causados por mangueiras danificadas, vedações desgastadas, bomba de drenagem com problema ou excesso de sabão. Nossa equipe faz o diagnóstico preciso.",
-      },
-      {
-        q: "A máquina faz barulho, o que pode ser?",
-        a: "Ruídos anormais podem indicar rolamentos desgastados, objetos presos no tambor, correias soltas ou problemas no motor. É importante verificar rapidamente para evitar danos maiores.",
-      },
-      {
-        q: "Quanto tempo leva o conserto?",
-        a: "Problemas simples são resolvidos na hora. Casos que necessitam de peças específicas podem levar de 1 a 5 dias úteis, dependendo da disponibilidade.",
-      },
-    ],
-  },
-};
+import { CheckCircle2, ArrowLeft, MapPin, Clock, Shield } from "lucide-react";
+import { servicesData, localBusinessSchema } from "@/data/servicesData";
 
 const ServicePage = () => {
   const { serviceName } = useParams<{ serviceName: string }>();
-  const service = serviceName ? serviceData[serviceName] : null;
+  const service = serviceName ? servicesData[serviceName] : null;
+
+  useEffect(() => {
+    if (service) {
+      window.scrollTo(0, 0);
+    }
+  }, [service]);
 
   if (!service) {
     return (
@@ -98,8 +42,39 @@ const ServicePage = () => {
     );
   }
 
+  // Schema markup para FAQ
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": service.faq.map((item: any) => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.a
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>{service.metaTitle}</title>
+        <meta name="description" content={service.metaDescription} />
+        <meta property="og:title" content={service.metaTitle} />
+        <meta property="og:description" content={service.metaDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://assisttech.com.br/servicos/${serviceName}`} />
+        <link rel="canonical" href={`https://assisttech.com.br/servicos/${serviceName}`} />
+        
+        <script type="application/ld+json">
+          {JSON.stringify(localBusinessSchema)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchema)}
+        </script>
+      </Helmet>
+
       <Header />
       
       <main className="flex-1">
@@ -113,8 +88,24 @@ const ServicePage = () => {
             </Button>
             
             <div className="max-w-4xl">
-              <h1 className="text-4xl font-bold mb-4">{service.title}</h1>
-              <p className="text-xl text-muted-foreground mb-6">{service.description}</p>
+              <h1 className="text-4xl font-bold mb-4">{service.h1}</h1>
+              <p className="text-xl text-muted-foreground mb-4">{service.description}</p>
+              
+              <div className="flex flex-wrap gap-4 mb-6">
+                <div className="flex items-center gap-2 bg-card px-4 py-2 rounded-lg">
+                  <MapPin className="h-5 w-5 text-accent" />
+                  <span className="text-sm font-medium">Atendemos toda São Paulo</span>
+                </div>
+                <div className="flex items-center gap-2 bg-card px-4 py-2 rounded-lg">
+                  <Clock className="h-5 w-5 text-accent" />
+                  <span className="text-sm font-medium">Disponível 24h</span>
+                </div>
+                <div className="flex items-center gap-2 bg-card px-4 py-2 rounded-lg">
+                  <Shield className="h-5 w-5 text-accent" />
+                  <span className="text-sm font-medium">Garantia 90 dias</span>
+                </div>
+              </div>
+              
               <div className="flex flex-wrap gap-4">
                 <Button size="lg" onClick={() => {
                   const contactSection = document.getElementById('contato');
@@ -135,15 +126,28 @@ const ServicePage = () => {
             <div className="max-w-4xl mx-auto">
               <Card className="mb-12">
                 <CardContent className="pt-6">
-                  <h2 className="text-2xl font-bold mb-4">Sobre o Serviço</h2>
+                  <h2 className="text-2xl font-bold mb-4">Sobre o Serviço de {service.title}</h2>
+                  <div className="prose prose-lg max-w-none">
+                    {service.longDescription.split('\n\n').map((paragraph: string, index: number) => (
+                      <p key={index} className="text-muted-foreground leading-relaxed mb-4">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="mb-12 bg-muted/30">
+                <CardContent className="pt-6">
+                  <h2 className="text-2xl font-bold mb-4">{service.h2Price}</h2>
                   <p className="text-muted-foreground leading-relaxed">
-                    {service.longDescription}
+                    {service.priceInfo}
                   </p>
                 </CardContent>
               </Card>
 
               <div className="mb-12">
-                <h2 className="text-2xl font-bold mb-6">Problemas Comuns</h2>
+                <h2 className="text-2xl font-bold mb-6">Problemas Comuns em {service.title}</h2>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {service.commonProblems.map((problem: string, index: number) => (
                     <div key={index} className="flex items-start gap-3 p-4 bg-muted/30 rounded-lg">
@@ -176,9 +180,9 @@ const ServicePage = () => {
 
               <Card className="bg-gradient-primary text-primary-foreground">
                 <CardContent className="pt-6 text-center">
-                  <h2 className="text-2xl font-bold mb-2">Precisa de Atendimento?</h2>
+                  <h2 className="text-2xl font-bold mb-2">Precisa de Atendimento Agora?</h2>
                   <p className="mb-6 opacity-90">
-                    Entre em contato agora e receba atendimento rápido e profissional
+                    Entre em contato e receba atendimento rápido com profissionais qualificados
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button 
