@@ -54,8 +54,8 @@ const ContactFormSection = () => {
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    const lead = addLead({
+  const onSubmit = async (data: FormData) => {
+    const lead = await addLead({
       nomeCliente: data.nomeCliente,
       telefone: data.telefone,
       email: data.email || "",

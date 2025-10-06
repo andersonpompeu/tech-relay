@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { useSupabaseProfessionals } from '@/hooks/useSupabaseProfessionals';
+import { useSupabaseLeads } from '@/hooks/useSupabaseLeads';
+import { useRotationIndex } from '@/hooks/useRotationIndex';
 
 export interface Professional {
   id: string;
@@ -31,109 +34,54 @@ interface LeadContextType {
   professionals: Professional[];
   leads: Lead[];
   currentIndex: number;
-  addProfessional: (professional: Omit<Professional, 'id' | 'leadsRecebidos' | 'leadsConvertidos' | 'tempoMedioResposta'>) => void;
-  updateProfessional: (id: string, updates: Partial<Professional>) => void;
-  deleteProfessional: (id: string) => void;
-  addLead: (lead: Omit<Lead, 'id' | 'timestamp' | 'profissionalDesignado' | 'status'>) => Lead | null;
-  updateLeadStatus: (id: string, status: Lead['status']) => void;
-  resetRotation: () => void;
+  isLoading: boolean;
+  addProfessional: (professional: Omit<Professional, 'id' | 'leadsRecebidos' | 'leadsConvertidos' | 'tempoMedioResposta'>) => Promise<void>;
+  updateProfessional: (id: string, updates: Partial<Professional>) => Promise<void>;
+  deleteProfessional: (id: string) => Promise<void>;
+  addLead: (lead: Omit<Lead, 'id' | 'timestamp' | 'profissionalDesignado' | 'status'>) => Promise<Lead | null>;
+  updateLeadStatus: (id: string, status: Lead['status']) => Promise<void>;
+  resetRotation: () => Promise<void>;
 }
 
 const LeadContext = createContext<LeadContextType | undefined>(undefined);
 
-const initialProfessionals: Professional[] = [
-  {
-    id: '1',
-    nome: 'João Silva',
-    telefone: '11999887766',
-    email: 'joao@email.com',
-    foto: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop',
-    especialidades: ['Geladeira', 'Freezer', 'Máquina de Lavar'],
-    ativo: true,
-    leadsRecebidos: 15,
-    leadsConvertidos: 12,
-    tempoMedioResposta: 8,
-  },
-  {
-    id: '2',
-    nome: 'Maria Santos',
-    telefone: '11988776655',
-    email: 'maria@email.com',
-    foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
-    especialidades: ['Fogão', 'Micro-ondas', 'Cooktop'],
-    ativo: true,
-    leadsRecebidos: 18,
-    leadsConvertidos: 15,
-    tempoMedioResposta: 6,
-  },
-  {
-    id: '3',
-    nome: 'Carlos Mendes',
-    telefone: '11977665544',
-    email: 'carlos@email.com',
-    foto: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop',
-    especialidades: ['Ar Condicionado', 'Lava-louças', 'Secadora'],
-    ativo: true,
-    leadsRecebidos: 12,
-    leadsConvertidos: 10,
-    tempoMedioResposta: 10,
-  },
-];
-
-const initialLeads: Lead[] = [
-  {
-    id: '1',
-    timestamp: new Date(Date.now() - 1000 * 60 * 30),
-    nomeCliente: 'Ana Paula',
-    telefone: '11966554433',
-    email: 'ana@email.com',
-    cep: '01310-100',
-    tipoAparelho: 'Geladeira',
-    descricaoProblema: 'Não está gelando',
-    melhorHorario: 'Manhã (8h-12h)',
-    profissionalDesignado: '1',
-    status: 'em_atendimento',
-  },
-  {
-    id: '2',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-    nomeCliente: 'Roberto Lima',
-    telefone: '11955443322',
-    email: 'roberto@email.com',
-    cep: '04567-890',
-    tipoAparelho: 'Fogão',
-    descricaoProblema: 'Boca não acende',
-    melhorHorario: 'Tarde (13h-17h)',
-    profissionalDesignado: '2',
-    status: 'convertido',
-  },
-];
-
 export const LeadProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [professionals, setProfessionals] = useState<Professional[]>(initialProfessionals);
-  const [leads, setLeads] = useState<Lead[]>(initialLeads);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { 
+    professionals, 
+    isLoading: professionalsLoading,
+    addProfessional: addProfessionalMutation,
+    updateProfessional: updateProfessionalMutation,
+    deleteProfessional: deleteProfessionalMutation,
+  } = useSupabaseProfessionals();
 
-  const addProfessional = (professional: Omit<Professional, 'id' | 'leadsRecebidos' | 'leadsConvertidos' | 'tempoMedioResposta'>) => {
-    const newProfessional: Professional = {
-      ...professional,
-      id: Date.now().toString(),
-      leadsRecebidos: 0,
-      leadsConvertidos: 0,
-      tempoMedioResposta: 0,
-    };
-    setProfessionals([...professionals, newProfessional]);
+  const {
+    leads,
+    isLoading: leadsLoading,
+    addLead: addLeadMutation,
+    updateLeadStatus: updateLeadStatusMutation,
+  } = useSupabaseLeads();
+
+  const {
+    currentIndex,
+    updateIndex,
+    resetRotation: resetRotationMutation,
+  } = useRotationIndex();
+
+  const isLoading = professionalsLoading || leadsLoading;
+
+  const addProfessional = async (professional: Omit<Professional, 'id' | 'leadsRecebidos' | 'leadsConvertidos' | 'tempoMedioResposta'>) => {
+    await addProfessionalMutation(professional);
   };
 
-  const updateProfessional = (id: string, updates: Partial<Professional>) => {
-    setProfessionals(professionals.map(p => p.id === id ? { ...p, ...updates } : p));
+  const updateProfessional = async (id: string, updates: Partial<Professional>) => {
+    await updateProfessionalMutation(id, updates);
   };
 
-  const deleteProfessional = (id: string) => {
-    setProfessionals(professionals.filter(p => p.id !== id));
+  const deleteProfessional = async (id: string) => {
+    await deleteProfessionalMutation(id);
   };
 
-  const addLead = (leadData: Omit<Lead, 'id' | 'timestamp' | 'profissionalDesignado' | 'status'>): Lead | null => {
+  const addLead = async (leadData: Omit<Lead, 'id' | 'timestamp' | 'profissionalDesignado' | 'status'>): Promise<Lead | null> => {
     const activeProfessionals = professionals.filter(p => p.ativo);
     
     if (activeProfessionals.length === 0) {
@@ -142,44 +90,38 @@ export const LeadProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const selectedProfessional = activeProfessionals[currentIndex % activeProfessionals.length];
     
-    const newLead: Lead = {
-      ...leadData,
-      id: Date.now().toString(),
-      timestamp: new Date(),
-      profissionalDesignado: selectedProfessional.id,
-      status: 'pendente',
-    };
-
-    setLeads([newLead, ...leads]);
+    const newLead = await addLeadMutation({
+      lead: leadData,
+      profissionalId: selectedProfessional.id,
+    });
     
-    setProfessionals(professionals.map(p => 
-      p.id === selectedProfessional.id 
-        ? { ...p, leadsRecebidos: p.leadsRecebidos + 1 }
-        : p
-    ));
+    await updateProfessional(selectedProfessional.id, {
+      leadsRecebidos: selectedProfessional.leadsRecebidos + 1,
+    });
 
-    setCurrentIndex((currentIndex + 1) % activeProfessionals.length);
+    await updateIndex((currentIndex + 1) % activeProfessionals.length);
 
     return newLead;
   };
 
-  const updateLeadStatus = (id: string, status: Lead['status']) => {
-    setLeads(leads.map(l => l.id === id ? { ...l, status } : l));
+  const updateLeadStatus = async (id: string, status: Lead['status']) => {
+    await updateLeadStatusMutation(id, status);
     
     if (status === 'convertido') {
       const lead = leads.find(l => l.id === id);
       if (lead) {
-        setProfessionals(professionals.map(p => 
-          p.id === lead.profissionalDesignado 
-            ? { ...p, leadsConvertidos: p.leadsConvertidos + 1 }
-            : p
-        ));
+        const professional = professionals.find(p => p.id === lead.profissionalDesignado);
+        if (professional) {
+          await updateProfessional(professional.id, {
+            leadsConvertidos: professional.leadsConvertidos + 1,
+          });
+        }
       }
     }
   };
 
-  const resetRotation = () => {
-    setCurrentIndex(0);
+  const resetRotation = async () => {
+    await resetRotationMutation();
   };
 
   return (
@@ -188,6 +130,7 @@ export const LeadProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         professionals,
         leads,
         currentIndex,
+        isLoading,
         addProfessional,
         updateProfessional,
         deleteProfessional,
