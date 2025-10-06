@@ -53,7 +53,7 @@ const BenefitsSection = () => {
             return (
               <Card 
                 key={benefit.title}
-                className="hover:shadow-lg transition-shadow animate-slide-up"
+                className="hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 animate-slide-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <CardHeader>

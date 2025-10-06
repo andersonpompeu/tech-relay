@@ -47,7 +47,7 @@ const HowItWorksSection = () => {
             return (
               <Card 
                 key={step.number}
-                className="relative overflow-hidden animate-slide-up"
+                className="relative overflow-hidden hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 animate-slide-up"
                 style={{ animationDelay: `${index * 0.15}s` }}
               >
                 <div className="absolute top-4 right-4 text-6xl font-bold text-primary/5">

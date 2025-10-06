@@ -95,7 +95,7 @@ const ServicesSection = () => {
             return (
               <Card 
                 key={service.slug} 
-                className="group hover:shadow-lg transition-all duration-300 animate-slide-up"
+                className="group hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 animate-slide-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <CardHeader>
