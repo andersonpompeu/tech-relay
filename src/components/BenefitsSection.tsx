@@ -26,6 +26,42 @@ const benefits = [{
   description: "Atendemos toda a região de São Paulo e grande São Paulo."
 }];
 const BenefitsSection = () => {
-  return;
+  return (
+    <section className="py-20 bg-background">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12 animate-fade-in">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
+            Por Que Nos Escolher
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Experiência, qualidade e compromisso com sua satisfação
+          </p>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {benefits.map((benefit, index) => {
+            const Icon = benefit.icon;
+            return (
+              <Card 
+                key={benefit.title}
+                className="hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 animate-slide-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <CardHeader>
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                    <Icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl">{benefit.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{benefit.description}</p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
 };
 export default BenefitsSection;

@@ -1,69 +1,67 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Refrigerator, 
-  WashingMachine, 
-  Flame, 
-  Microwave, 
-  Wind, 
-  Droplets,
-  UtensilsCrossed,
-  Waves
-} from "lucide-react";
+import geladeiraImg from "@/assets/services/geladeira.png";
+import maquinaLavarImg from "@/assets/services/maquina-lavar.png";
+import fogaoImg from "@/assets/services/fogao.png";
+import microOndasImg from "@/assets/services/micro-ondas.png";
+import lavaLoucasImg from "@/assets/services/lava-loucas.png";
+import arCondicionadoImg from "@/assets/services/ar-condicionado.png";
+import freezerImg from "@/assets/services/freezer.png";
+import tanquinhoImg from "@/assets/services/tanquinho.png";
 
 const services = [
   {
-    icon: Refrigerator,
+    image: geladeiraImg,
     name: "Geladeira e Freezer",
     slug: "conserto-geladeira",
     description: "Conserto e manutenção de geladeiras e freezers de todas as marcas. Problemas com temperatura, ruídos e vazamentos.",
     price: "A partir de R$ 120",
   },
   {
-    icon: WashingMachine,
+    image: maquinaLavarImg,
     name: "Máquina de Lavar",
     slug: "conserto-maquina-lavar",
     description: "Reparos em máquinas de lavar roupas. Vazamentos, problemas na centrifugação e componentes elétricos.",
     price: "A partir de R$ 100",
   },
   {
-    icon: Flame,
+    image: fogaoImg,
     name: "Fogão e Cooktop",
     slug: "conserto-fogao",
     description: "Conserto de fogões e cooktops. Problemas com acendimento, válvulas, queimadores e forno.",
     price: "A partir de R$ 90",
   },
   {
-    icon: Microwave,
+    image: microOndasImg,
     name: "Micro-ondas",
     slug: "conserto-micro-ondas",
     description: "Reparo de micro-ondas de todas as marcas. Problemas com aquecimento, painel e componentes internos.",
     price: "A partir de R$ 110",
   },
   {
-    icon: UtensilsCrossed,
+    image: lavaLoucasImg,
     name: "Lava-louças",
     slug: "conserto-lava-loucas",
     description: "Manutenção e conserto de lava-louças. Vazamentos, problemas de drenagem e ciclos de lavagem.",
     price: "A partir de R$ 130",
   },
   {
-    icon: Wind,
+    image: arCondicionadoImg,
     name: "Ar Condicionado",
     slug: "conserto-ar-condicionado",
     description: "Instalação, manutenção e conserto de ar condicionado. Limpeza, recarga de gás e problemas elétricos.",
     price: "A partir de R$ 150",
   },
   {
-    icon: Refrigerator,
+    image: freezerImg,
     name: "Freezer",
     slug: "conserto-freezer",
     description: "Conserto de freezers verticais e horizontais. Problemas de refrigeração, gás e componentes.",
     price: "A partir de R$ 140",
   },
   {
-    icon: WashingMachine,
+    image: tanquinhoImg,
     name: "Tanquinho",
     slug: "conserto-tanquinho",
     description: "Reparo de tanquinhos. Centrifugação, motor, timer e componentes elétricos.",
@@ -91,7 +89,6 @@ const ServicesSection = () => {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((service, index) => {
-            const Icon = service.icon;
             return (
               <Card 
                 key={service.slug} 
@@ -99,8 +96,12 @@ const ServicesSection = () => {
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <CardHeader>
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary transition-colors">
-                    <Icon className="h-6 w-6 text-primary group-hover:text-primary-foreground transition-colors" />
+                  <div className="mb-4 w-full h-32 overflow-hidden rounded-lg">
+                    <img 
+                      src={service.image} 
+                      alt={service.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
                   <CardTitle className="text-xl">{service.name}</CardTitle>
                   <CardDescription>{service.description}</CardDescription>
